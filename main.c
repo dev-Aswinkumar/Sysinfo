@@ -12,36 +12,12 @@ char*  get_hostname(){
   }
 }
 
-
-char* get_kernel(){
+int sysd_info(){
   if (uname(&getme)==0){
-    char* kernel=getme.release;
-    return kernel;
+    return 0;
   }
   else{
-    return "cannot detect";
-  }
-}
-
-
-char* get_os(){
-  if (uname(&getme)==0){
-    char* os=getme.sysname;
-    return os;
-  }
-  else{
-    return "cannot detect";
-  }
-}
-
-
-char* get_architecture(){
-  if (uname(&getme)==0){
-    char* os=getme.machine;
-    return os;
-  }
-  else{
-    return "cannot detect";
+    return -1;
   }
 }
 
@@ -50,9 +26,20 @@ int main(){
   printf("System Information\n");
   printf("------------------\n");
   char* hostname = get_hostname();
-  char* kernel=get_kernel();
-  char* os=get_os();
-  char* architecture=get_architecture();
+  char* kernel;
+  char* os;
+  char* architecture;
+  if(sysd_info()==-1){
+    char* failed="cannot detect";
+    kernel=failed;
+    os=failed;
+    architecture=failed;
+  }
+  else{
+   kernel=getme.release;
+   os=getme.sysname;
+   architecture=getme.machine;
+  }
   printf("Hostname: %s\n",hostname);
   printf("Os: %s\n",os);
   printf("Kernel: %s\n",kernel);
