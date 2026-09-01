@@ -2,7 +2,9 @@
 #include <unistd.h>
 #include <sys/utsname.h>
 #include <string.h>
+#include <stdlib.h>
 char* failed="cannot detect";
+
 //function to get the hostname
 char*  get_hostname(){
   static char hostname[256];
@@ -13,6 +15,7 @@ char*  get_hostname(){
     return failed;
   }
 }
+
 //function to get the total memory
 char* get_memtot(){
   FILE *file=fopen("/proc/meminfo","r");
@@ -67,15 +70,17 @@ int main(){
     os=failed;
     architecture=failed;
   }
-  char* memtot=get_memtot();
-  char* memavai=get_memavai();
+  char* memtotval=get_memtot();
+  char* memavaival=get_memavai();
+  double memtot=(strtoul(memtotval,NULL,10)/1024.0)/1024.0;
+  double memavai=(strtoul(memavaival,NULL,10)/1024.0)/1024.0;
   printf("System Information\n");
   printf("------------------\n");
   printf("Hostname: %s\n",hostname);
   printf("Os: %s\n",os);
   printf("Kernel: %s\n",kernel);
   printf("Architecture: %s\n",architecture);
-  printf("Total Memory: %.7s\n",memtot);
-  printf("Total Available: %.7s\n",memavai);
+  printf("Total Memory: %.1f GB\n",memtot);
+  printf("Total Available: %.1f GB\n",memavai);
   return 0;
 }
