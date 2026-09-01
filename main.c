@@ -72,8 +72,6 @@ int main(){
   }
   char* memtotval=get_memtot();
   char* memavaival=get_memavai();
-  double memtot=(strtoul(memtotval,NULL,10)/1024.0)/1024.0;
-  double memavai=(strtoul(memavaival,NULL,10)/1024.0)/1024.0;
   printf("System Information\n");
   printf("------------------\n");
   printf("Hostname: %s\n",hostname);
