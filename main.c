@@ -82,12 +82,16 @@ int main(){
   printf("------\n");
   if (memtotval!=failed){
     double memtot=(strtoul(memtotval,NULL,10)/1024.0)/1024.0;
-    double memavai=(strtoul(memavaival,NULL,10)/1024.0)/1024.0;
     printf("Total Memory: %.1f GB\n",memtot);
-    printf("Memory Available: %.1f GB\n",memavai);
   }
   else{
     printf("Total Memory: %s \n",failed);
+  }
+  if (memavaival!=failed){
+    double memavai=(strtoul(memavaival,NULL,10)/1024.0)/1024.0;
+    printf("Memory Available: %.1f GB\n",memavai);
+  }
+  else{
     printf("Memory Available: %s \n",failed);
   }
   return 0;
