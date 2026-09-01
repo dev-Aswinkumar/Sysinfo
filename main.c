@@ -79,8 +79,10 @@ int main(){
   printf("Hostname: %s\n",hostname);
   printf("Os: %s\n",os);
   printf("Kernel: %s\n",kernel);
-  printf("Architecture: %s\n",architecture);
+  printf("Architecture: %s\n\n",architecture);
+  printf("Memory\n");
+  printf("------\n");
   printf("Total Memory: %.1f GB\n",memtot);
-  printf("Total Available: %.1f GB\n",memavai);
+  printf("Memory Available: %.1f GB\n",memavai);
   return 0;
 }
