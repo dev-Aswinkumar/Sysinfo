@@ -54,6 +54,41 @@ char* get_memavai(){
   }
 }
 
+//function to get memory type
+char* get_memtype(){
+  FILE *cmd=popen("dmidecode --type memory", "r");
+  static char line[256];
+  if(cmd==NULL){
+    return failed;
+  }
+  else{
+    while(fgets(line,sizeof(line),cmd)){
+      if(strncmp(line,"\tType:",6)==0){
+        pclose(cmd);
+        return line+7;
+      }
+    }
+    pclose(cmd);
+    return failed;
+  }
+}
+char* get_memspeed(){
+  FILE *cmd=popen("dmidecode --type memory", "r");
+  static char line[256];
+  if(cmd==NULL){
+    return failed;
+  }
+  else{
+    while(fgets(line,sizeof(line),cmd)){
+      if(strncmp(line,"\tSpeed:",7)==0){
+        pclose(cmd);
+        return line+8;
+      }
+    }
+    pclose(cmd);
+    return failed;
+  }
+}
 int main(){
   struct utsname getme;
   char* hostname = get_hostname();
@@ -72,6 +107,8 @@ int main(){
   }
   char* memtotval=get_memtot();
   char* memavaival=get_memavai();
+  char* memtyp=get_memtype();
+  char* memspd=get_memspeed();
   printf("System Information\n");
   printf("------------------\n");
   printf("Hostname: %s\n",hostname);
@@ -94,5 +131,7 @@ int main(){
   else{
     printf("Memory Available: %s \n",failed);
   }
+  printf("Memory type: %s",memtyp);
+  printf("Memory speed: %s",memspd);
   return 0;
 }
