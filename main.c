@@ -35,25 +35,6 @@ char* get_memtot(){
   }
 }
 
-//function to get the memory available
-char* get_memavai(){
-  FILE *file=fopen("/proc/meminfo","r");
-  static char line[256];
-  if(file==NULL){
-    return failed;
-  }
-  else{
-    while(fgets(line,sizeof(line),file)){
-      if(strncmp(line,"MemAvailable:",13)==0){
-        fclose(file);
-        return line+17;
-      }
-    }
-    fclose(file);
-    return failed;
-  }
-}
-
 //function to get memory type
 char* get_memtype(){
   FILE *cmd=popen("dmidecode --type memory", "r");
@@ -72,6 +53,25 @@ char* get_memtype(){
     return failed;
   }
 }
+
+char* get_memavai(){
+  FILE *file=fopen("/proc/meminfo","r");
+  static char line[256];
+  if(file==NULL){
+    return failed;
+  }
+  else{
+    while(fgets(line,sizeof(line),file)){
+      if(strncmp(line,"MemAvailable:",13)==0){
+        fclose(file);
+        return line+17;
+      }
+    }
+    fclose(file);
+    return failed;
+  }
+}
+
 char* get_memspeed(){
   FILE *cmd=popen("dmidecode --type memory", "r");
   static char line[256];
@@ -139,29 +139,22 @@ int main(){
   char* memavaival=get_memavai();
   char* memtyp=get_memtype();
   char* memspd=get_memspeed();
-  printf("\t\tSystem Information\n");
-  printf("\t\t------------------\n\n");
-  printf("Hostname: %s\n",hostname);
-  printf("Os: %s\n",os);
-  printf("Kernel: Linux %s\n",kernel);
-  printf("Architecture: %s\n\n",architecture);
-  printf("\t\t      Memory\n");
-  printf("\t\t      ------\n\n");
-  if (memtotval!=failed){
-    double memtot=(strtoul(memtotval,NULL,10)/1024.0)/1024.0;
-    printf("Total Memory: %.1f GB\n",memtot);
+  printf("\033[34m%-20s\033[0m %s\n", "Operating system:", os);
+  printf("\033[34m%-20s\033[0m Linux %s\n", "Kernel:", kernel);
+  printf("\033[34m%-20s\033[0m %s\n", "Hostname:", hostname);
+  printf("\033[34m%-20s\033[0m %s\n", "Architecture:", architecture);
+
+  if (memtotval!=failed && memavaival!=failed){
+      double memtot=(strtoul(memtotval,NULL,10)/1024.0)/1024.0;
+      double memavai=(strtoul(memavaival,NULL,10)/1024.0)/1024.0;
+      int mempercent = ((memtot - memavai) / memtot) * 100;
+      printf("\033[34m%-20s\033[0m %.1f GB / %.1f GB \033[32m(%d%)\n", "Memory:", memavai,memtot,mempercent);
   }
   else{
-    printf("Total Memory: %s \n",failed);
+      printf("\033[34m%-20s\033[0m %s\n", "Memory:", failed);
   }
-  if (memavaival!=failed){
-    double memavai=(strtoul(memavaival,NULL,10)/1024.0)/1024.0;
-    printf("Memory Available: %.1f GB\n",memavai);
-  }
-  else{
-    printf("Memory Available: %s \n",failed);
-  }
-  printf("Memory type: %s",memtyp);
-  printf("Memory speed: %s",memspd);
+
+  printf("\033[34m%-20s\033[0m %s", "Memory type:", memtyp);
+  printf("\033[34m%-20s\033[0m %s", "Memory speed:", memspd);
   return 0;
 }
