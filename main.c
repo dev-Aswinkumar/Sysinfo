@@ -4,7 +4,35 @@
 #include <string.h>
 #include <stdlib.h>
 char* failed="cannot detect";
-
+//function to display logo
+void print_logo(){
+  char *logo[]={
+    "                 ↑↑↑↑↑↑↑↑",
+    "             ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+    "          ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+    "        ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+    "       ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+    "       ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+    "       ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+    "       ↑↑↑↑↑   ↑↑↑       ↑↑↑↑↑↑       ",
+    "    ↑  ↑↑↑    ↑↑↑  ↑↑↑↑    ↑↑↑   ↑↑↑↑ ",
+    "    ↑  ↑   ↑↑↑↑↑↑↑↑↑↑↑↑↑↑  ↑↑↑   ↑↑↑↑↑",
+    "    ↑    ↑↑↑↑↑↑↑↑          ↑↑↑↑       ",
+    "       ↑   ↑↑↑↑↑↑  ↑↑↑↑↑↑  ↑↑↑↑↑↑↑↑↑  ",
+    "       ↑↑↑   ↑↑↑↑  ↑↑↑↑↑   ↑↑↑↑↑↑↑↑↑↑ ",
+    "       ↑↑↑↑↑   ↑↑          ↑↑↑        ",
+    "       ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+    "        ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+    "          ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+    "            ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
+    "                 ↑↑↑↑↑↑↑↑",
+  };
+  printf("\033[34m");
+  for(int i = 0; i < 19; i++){
+    printf("%s\n", logo[i]);
+  }
+  printf("\033[0m");
+}
 //function to get the hostname
 char*  get_hostname(){
   static char hostname[256];
@@ -34,7 +62,24 @@ char* get_memtot(){
     return failed;
   }
 }
-
+// function to get memory available
+char* get_memavai(){
+  FILE *file=fopen("/proc/meminfo","r");
+  static char line[256];
+  if(file==NULL){
+    return failed;
+  }
+  else{
+    while(fgets(line,sizeof(line),file)){
+      if(strncmp(line,"MemAvailable:",13)==0){
+        fclose(file);
+        return line+17;
+      }
+    }
+    fclose(file);
+    return failed;
+  }
+}
 //function to get memory type
 char* get_memtype(){
   FILE *cmd=popen("dmidecode --type memory", "r");
@@ -53,25 +98,7 @@ char* get_memtype(){
     return failed;
   }
 }
-
-char* get_memavai(){
-  FILE *file=fopen("/proc/meminfo","r");
-  static char line[256];
-  if(file==NULL){
-    return failed;
-  }
-  else{
-    while(fgets(line,sizeof(line),file)){
-      if(strncmp(line,"MemAvailable:",13)==0){
-        fclose(file);
-        return line+17;
-      }
-    }
-    fclose(file);
-    return failed;
-  }
-}
-
+//function to get memory speed
 char* get_memspeed(){
   FILE *cmd=popen("dmidecode --type memory", "r");
   static char line[256];
@@ -82,6 +109,7 @@ char* get_memspeed(){
     while(fgets(line,sizeof(line),cmd)){
       if(strncmp(line,"\tSpeed:",7)==0){
         pclose(cmd);
+        
         return line+8;
       }
     }
@@ -89,7 +117,7 @@ char* get_memspeed(){
     return failed;
   }
 }
-
+//function to get os name
 char* get_os(){
   FILE *file=fopen("/etc/os-release","r");
   static char os_name[256];
@@ -114,9 +142,11 @@ char* get_os(){
     }
   }
   if(final==2){
+    fclose(file);
     return strcat(os_name,os_version);
   }
   else{
+    fclose(file);
     return failed;
   }
 }
@@ -137,8 +167,15 @@ int main(){
   }
   char* memtotval=get_memtot();
   char* memavaival=get_memavai();
-  char* memtyp=get_memtype();
-  char* memspd=get_memspeed();
+  char* memtypval=get_memtype();
+  char* memspdval=get_memspeed();
+  char memtyp[256];
+  char memspd[256];
+  strcpy(memtyp,memtypval);
+  strcpy(memspd,memspdval);
+  memtyp[strlen(memtyp) - 1] = '\0';
+  memspd[strlen(memspd) - 1] = '\0';
+  print_logo();
   printf("\033[34m%-20s\033[0m %s\n", "Operating system:", os);
   printf("\033[34m%-20s\033[0m Linux %s\n", "Kernel:", kernel);
   printf("\033[34m%-20s\033[0m %s\n", "Hostname:", hostname);
@@ -148,13 +185,13 @@ int main(){
       double memtot=(strtoul(memtotval,NULL,10)/1024.0)/1024.0;
       double memavai=(strtoul(memavaival,NULL,10)/1024.0)/1024.0;
       int mempercent = ((memtot - memavai) / memtot) * 100;
-      printf("\033[34m%-20s\033[0m %.1f GB / %.1f GB \033[32m(%d%)\n", "Memory:", memavai,memtot,mempercent);
+      printf("\033[34m%-20s\033[0m %.1f GB / %.1f GB \033[32m(%d%%)\n", "Memory:", memavai,memtot,mempercent);
   }
   else{
       printf("\033[34m%-20s\033[0m %s\n", "Memory:", failed);
   }
 
-  printf("\033[34m%-20s\033[0m %s", "Memory type:", memtyp);
-  printf("\033[34m%-20s\033[0m %s", "Memory speed:", memspd);
+  printf("\033[34m%-20s\033[0m %s\n", "Memory type:", memtyp);
+  printf("\033[34m%-20s\033[0m %s\n", "Memory speed:", memspd);
   return 0;
 }
