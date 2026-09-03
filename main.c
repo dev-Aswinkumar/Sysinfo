@@ -89,34 +89,64 @@ char* get_memspeed(){
     return failed;
   }
 }
+
+char* get_os(){
+  FILE *file=fopen("/etc/os-release","r");
+  static char os_name[256];
+  static char os_version[256];
+  char line[256];
+  int final=-1;
+  if(file==NULL){
+    return failed;
+  }
+  else{
+    while(fgets(line,sizeof(line),file)){
+      if (strncmp(line, "NAME=", 5) == 0){
+        strcpy(os_name, line + 6);
+        os_name[strlen(os_name)-2]=0;
+        final=1;
+      }
+      if (strncmp(line, "VERSION=", 8) == 0){
+        strcpy(os_version, line + 9);
+        os_version[strlen(os_version) - 2] = '\0';
+        final=final+1;
+      }
+    }
+  }
+  if(final==2){
+    return strcat(os_name,os_version);
+  }
+  else{
+    return failed;
+  }
+}
+
 int main(){
   struct utsname getme;
   char* hostname = get_hostname();
   char* kernel;
-  char* os;
+  char* os=get_os();
   char* architecture;
   if(uname(&getme)==0){
     kernel=getme.release;
-    os=getme.sysname;
     architecture=getme.machine;
   }
   else{
     kernel=failed;
-    os=failed;
     architecture=failed;
   }
   char* memtotval=get_memtot();
   char* memavaival=get_memavai();
   char* memtyp=get_memtype();
   char* memspd=get_memspeed();
-  printf("System Information\n");
-  printf("------------------\n");
+  printf("\t\tSystem Information\n");
+  printf("\t\t------------------\n\n");
   printf("Hostname: %s\n",hostname);
   printf("Os: %s\n",os);
-  printf("Kernel: %s\n",kernel);
+  printf("Kernel: Linux %s\n",kernel);
   printf("Architecture: %s\n\n",architecture);
-  printf("Memory\n");
-  printf("------\n");
+  printf("\t\t      Memory\n");
+  printf("\t\t      ------\n\n");
   if (memtotval!=failed){
     double memtot=(strtoul(memtotval,NULL,10)/1024.0)/1024.0;
     printf("Total Memory: %.1f GB\n",memtot);
