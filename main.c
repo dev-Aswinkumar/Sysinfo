@@ -143,7 +143,23 @@ char* get_os(){
     return failed;
   }
 }
-
+//function to get cpu information
+char* get_cpuname(){
+  FILE *file=fopen("/proc/cpuinfo","r");
+  static char line[256];
+  if(file==NULL){
+    fclose(file);
+    return failed;
+  }
+  while(fgets(line,sizeof(line),file)){
+    if(strncmp(line,"model name",10)==0){
+      fclose(file);
+      return line+13;
+    }
+  }
+  fclose(file);
+  return failed;
+}
 int main(){
   struct utsname getme;
   char* hostname = get_hostname();
@@ -168,9 +184,16 @@ int main(){
   strcpy(memspd,memspdval);
   memtyp[strlen(memtyp) - 1] = '\0';
   memspd[strlen(memspd) - 1] = '\0';
+  char* cpuname=get_cpuname();
+  printf("\n");
   for(int i=0;i<19;i++){
-    printf("\033[34m%s\033[0m    ",logo[i]);
-    printf("\033[42G");
+    if(i%2==0){
+      printf("\033[94m%s\033[0m    ",logo[i]);
+      printf("\033[42G");
+    }else{
+      printf("\033[35m%s\033[0m    ",logo[i]);
+      printf("\033[42G");
+    }
     if(i==0){
       printf("\033[34m%-20s\033[0m %s\n", "Operating system:", os);
     }else if(i==1){
@@ -193,9 +216,12 @@ int main(){
       printf("\033[34m%-20s\033[0m %s\n", "Memory type:", memtyp);
    }else if(i==6){
       printf("\033[34m%-20s\033[0m %s\n", "Memory speed:", memspd);
+   }else if(i==7){
+      printf("\033[34m%-20s\033[0m %s\n", "CPU:", cpuname);
    }else{
       printf("\n");
    }
   }
-      return 0;
+  printf("\n\n");
+  return 0;
 }
