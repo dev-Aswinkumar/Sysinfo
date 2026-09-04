@@ -182,9 +182,12 @@ int main(){
   char memspd[256];
   strcpy(memtyp,memtypval);
   strcpy(memspd,memspdval);
-  memtyp[strlen(memtyp) - 1] = '\0';
-  memspd[strlen(memspd) - 1] = '\0';
-  char* cpuname=get_cpuname();
+  memtyp[strlen(memtyp) - 1]='\0';
+  memspd[strlen(memspd) - 1]='\0';
+  char* cpunameval=get_cpuname();
+  char cpuname[100];
+  strcpy(cpuname,cpunameval);
+  cpuname[strlen(cpuname)-1]='\0';
   printf("\n");
   for(int i=0;i<19;i++){
     if(i%2==0){
