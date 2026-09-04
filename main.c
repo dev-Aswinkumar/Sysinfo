@@ -4,9 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 char* failed="cannot detect";
-//function to display logo
-void print_logo(){
-  char *logo[]={
+//array for the logo
+char *logo[]={
     "                 ↑↑↑↑↑↑↑↑",
     "             ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
     "          ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
@@ -27,12 +26,6 @@ void print_logo(){
     "            ↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑",
     "                 ↑↑↑↑↑↑↑↑",
   };
-  printf("\033[34m");
-  for(int i = 0; i < 19; i++){
-    printf("%s\n", logo[i]);
-  }
-  printf("\033[0m");
-}
 //function to get the hostname
 char*  get_hostname(){
   static char hostname[256];
@@ -175,23 +168,34 @@ int main(){
   strcpy(memspd,memspdval);
   memtyp[strlen(memtyp) - 1] = '\0';
   memspd[strlen(memspd) - 1] = '\0';
-  print_logo();
-  printf("\033[34m%-20s\033[0m %s\n", "Operating system:", os);
-  printf("\033[34m%-20s\033[0m Linux %s\n", "Kernel:", kernel);
-  printf("\033[34m%-20s\033[0m %s\n", "Hostname:", hostname);
-  printf("\033[34m%-20s\033[0m %s\n", "Architecture:", architecture);
-
-  if (memtotval!=failed && memavaival!=failed){
-      double memtot=(strtoul(memtotval,NULL,10)/1024.0)/1024.0;
-      double memavai=(strtoul(memavaival,NULL,10)/1024.0)/1024.0;
-      int mempercent = ((memtot - memavai) / memtot) * 100;
-      printf("\033[34m%-20s\033[0m %.1f GB / %.1f GB \033[32m(%d%%)\n", "Memory:", memavai,memtot,mempercent);
+  for(int i=0;i<19;i++){
+    printf("\033[34m%s\033[0m    ",logo[i]);
+    printf("\033[42G");
+    if(i==0){
+      printf("\033[34m%-20s\033[0m %s\n", "Operating system:", os);
+    }else if(i==1){
+      printf("\033[34m%-20s\033[0m Linux %s\n", "Kernel:", kernel);
+    }else if(i==2){
+      printf("\033[34m%-20s\033[0m %s\n", "Hostname:", hostname);
+    }else if(i==3){
+      printf("\033[34m%-20s\033[0m %s\n", "Architecture:", architecture);
+    }else if(i==4){
+      if (memtotval!=failed && memavaival!=failed){
+        double memtot=(strtoul(memtotval,NULL,10)/1024.0)/1024.0;
+        double memavai=(strtoul(memavaival,NULL,10)/1024.0)/1024.0;
+        int mempercent = ((memtot - memavai) / memtot) * 100;
+        printf("\033[34m%-20s\033[0m %.1f GB / %.1f GB \033[32m(%d%%)\n", "Memory:", memavai,memtot,mempercent);
+      }
+      else{
+        printf("\033[34m%-20s\033[0m %s\n", "Memory:", failed);
+      }
+   }else if(i==5){
+      printf("\033[34m%-20s\033[0m %s\n", "Memory type:", memtyp);
+   }else if(i==6){
+      printf("\033[34m%-20s\033[0m %s\n", "Memory speed:", memspd);
+   }else{
+      printf("\n");
+   }
   }
-  else{
-      printf("\033[34m%-20s\033[0m %s\n", "Memory:", failed);
-  }
-
-  printf("\033[34m%-20s\033[0m %s\n", "Memory type:", memtyp);
-  printf("\033[34m%-20s\033[0m %s\n", "Memory speed:", memspd);
-  return 0;
+      return 0;
 }
