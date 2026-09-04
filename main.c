@@ -148,13 +148,29 @@ char* get_cpuname(){
   FILE *file=fopen("/proc/cpuinfo","r");
   static char line[256];
   if(file==NULL){
-    fclose(file);
     return failed;
   }
   while(fgets(line,sizeof(line),file)){
     if(strncmp(line,"model name",10)==0){
       fclose(file);
       return line+13;
+    }
+  }
+  fclose(file);
+  return failed;
+}
+//function to get cpu core
+char* get_cpucore(){
+  FILE *file=fopen("/proc/cpuinfo","r");
+  static char line[256];
+  if(file==NULL){
+    fclose(file);
+    return failed;
+  }
+  while(fgets(line,sizeof(line),file)){
+    if(strncmp(line,"cpu cores",9)==0){
+      fclose(file);
+      return line+12;
     }
   }
   fclose(file);
@@ -188,6 +204,10 @@ int main(){
   char cpuname[100];
   strcpy(cpuname,cpunameval);
   cpuname[strlen(cpuname)-1]='\0';
+  char* cpucoreval=get_cpucore();
+  char cpucore[100];
+  strcpy(cpucore,cpucoreval);
+  cpucore[strlen(cpucore)-1]='\0';
   printf("\n");
   for(int i=0;i<19;i++){
     if(i%2==0){
@@ -198,30 +218,33 @@ int main(){
       printf("\033[42G");
     }
     if(i==0){
-      printf("\033[34m%-20s\033[0m %s\n", "Operating system:", os);
+      printf("\033[34m%-14s\033[0m %s\n", "Os:", os);
     }else if(i==1){
-      printf("\033[34m%-20s\033[0m Linux %s\n", "Kernel:", kernel);
+      printf("\033[34m%-14s\033[0m Linux %s\n", "Kernel:", kernel);
     }else if(i==2){
-      printf("\033[34m%-20s\033[0m %s\n", "Hostname:", hostname);
+      printf("\033[34m%-14s\033[0m %s\n", "Hostname:", hostname);
     }else if(i==3){
-      printf("\033[34m%-20s\033[0m %s\n", "Architecture:", architecture);
+      printf("\033[34m%-14s\033[0m %s\n", "Architecture:", architecture);
     }else if(i==4){
       if (memtotval!=failed && memavaival!=failed){
         double memtot=(strtoul(memtotval,NULL,10)/1024.0)/1024.0;
         double memavai=(strtoul(memavaival,NULL,10)/1024.0)/1024.0;
         int mempercent = ((memtot - memavai) / memtot) * 100;
-        printf("\033[34m%-20s\033[0m %.1f GB / %.1f GB \033[32m(%d%%)\n", "Memory:", memavai,memtot,mempercent);
+        printf("\033[34m%-14s\033[0m %.1f GB / %.1f GB \033[32m(%d%%)\n", "Memory:", memavai,memtot,mempercent);
       }
       else{
-        printf("\033[34m%-20s\033[0m %s\n", "Memory:", failed);
+        printf("\033[34m%-14s\033[0m %s\n", "Memory:", failed);
       }
    }else if(i==5){
-      printf("\033[34m%-20s\033[0m %s\n", "Memory type:", memtyp);
+      printf("\033[34m%-14s\033[0m %s\n", "Memory type:", memtyp);
    }else if(i==6){
-      printf("\033[34m%-20s\033[0m %s\n", "Memory speed:", memspd);
+      printf("\033[34m%-14s\033[0m %s\n", "Memory speed:", memspd);
    }else if(i==7){
-      printf("\033[34m%-20s\033[0m %s\n", "CPU:", cpuname);
-   }else{
+      printf("\033[34m%-14s\033[0m %s\n", "CPU:", cpuname);
+   }else if(i==8){
+      printf("\033[34m%-14s\033[0m %s\n", "CPU cores:", cpucore);
+   }
+   else{
       printf("\n");
    }
   }
